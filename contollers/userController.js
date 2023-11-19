@@ -25,4 +25,32 @@ const signup = async (req, res) => {
   }
 };
 
-module.exports = { signup };
+const login = async (req, res) => {
+  try {
+    const existinguser = await user.findOne({ email: req.body.email });
+    const isMatch = await existinguser.comparePassword(
+      req.body.password,
+      existinguser.password
+    );
+    if (existinguser && !isMatch) {
+      return res.status(400).json({
+        status: "fail",
+        message: "user is not exisiting user please try to login",
+      });
+    }
+
+    res.status(201).json({
+      status: "success",
+      data: {
+        existinguser,
+      },
+    });
+  } catch (error) {
+    res.status(400).json({
+      status: "fail",
+      message: error.message,
+    });
+  }
+};
+
+module.exports = { signup, login };
