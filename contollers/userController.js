@@ -1,16 +1,16 @@
-const user = require("../models/User");
+const User = require("../models/User");
 const signup = async (req, res) => {
   const { name, email, password, confirmPassword } = req.body;
   try {
     //verify if user is present already
-    const exsistingUser = await user.findOne({ email: req.body.email });
-    if (exsistingUser) {
-      return res.status(400).json({
+    const existingUser = await User.findOne({ email: req.body.email });
+    if (existingUser) {
+      return res.status(401).json({
         status: "fail",
-        message: "user exists already, try logging in",
+        message: "user exists already,try logging in",
       });
     }
-    const newUser = await user.create(req.body);
+    const newUser = await User.create(req.body);
     res.status(201).json({
       status: "success",
       data: {
@@ -27,22 +27,22 @@ const signup = async (req, res) => {
 
 const login = async (req, res) => {
   try {
-    const existinguser = await user.findOne({ email: req.body.email });
-    const isMatch = await existinguser.comparePassword(
+    const existingUser = await User.findOne({ email: req.body.email });
+    const isMatch = await existingUser.comparePassword(
       req.body.password,
-      existinguser.password
+      existingUser.password
     );
-    if (existinguser && !isMatch) {
+    if (!existingUser && !isMatch) {
       return res.status(400).json({
         status: "fail",
-        message: "user is not exisiting user please try to login",
+        message: "User name and password is not correct",
       });
     }
 
-    res.status(201).json({
+    res.status(200).json({
       status: "success",
       data: {
-        existinguser,
+        existingUser,
       },
     });
   } catch (error) {
@@ -53,4 +53,7 @@ const login = async (req, res) => {
   }
 };
 
-module.exports = { signup, login };
+module.exports = {
+  signup,
+  login,
+};
