@@ -1,9 +1,9 @@
 const router = require("express").Router();
 const { postBlog, getBlogs, getBlog, updateBlog, deleteBlog, getByAuthor} = require("../contollers/createBlogControllers");
 
-const auth = require("../middlewares/authMiddleWare");
+const {auth,verifyRole} = require("../middlewares/authMiddleWare");
 
-router.post("/",auth,postBlog)
+router.post("/",auth,verifyRole(["author","admin"]),postBlog)
 router.get("/",auth,getBlogs)
 router.get("/author",auth,getByAuthor)
 router.get("/:id",auth,getBlog)

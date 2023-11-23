@@ -34,7 +34,10 @@ const userSchema = new Schema(
     },
     role: {
       type: String,
-      enum: ["user", "admin", "author"],
+      enum: {
+        values: ["user", "admin", "author"],
+        message: `{VALUE} role is not defined`,
+      },
       default: "admin",
     },
   },
@@ -42,10 +45,10 @@ const userSchema = new Schema(
 );
 userSchema.pre("save", async function (next) {
   this.password = await bcrypt.hash(this.password, 10);
-  next()
+  next();
 });
 
-userSchema.methods.comparePassword=async function(pwd,pwdDB){
-  return await bcrypt.compare(pwd,pwdDB)
-}
+userSchema.methods.comparePassword = async function (pwd, pwdDB) {
+  return await bcrypt.compare(pwd, pwdDB);
+};
 module.exports = model("user", userSchema);
