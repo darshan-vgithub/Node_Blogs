@@ -30,10 +30,8 @@ const blogSchema = new Schema({
     type: Number,
     default: 1,
     validator: {
-      validate: function (value) {
-        return value >= 1 && value <= 5;
-      },
-      message: "ratings should between 1 and 5",
+     max:[5,"above 1"],
+     min:[1,"below 5"],
     },
   },
 });
