@@ -4,7 +4,7 @@ const blogSchema = new Schema({
   title: {
     type: String,
     trim: true,
-    required: [true, "snippet is required"],
+    required: [true, "title is required"],
   },
   snippet: {
     type: String,

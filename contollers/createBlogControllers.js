@@ -1,157 +1,103 @@
-const { query } = require("express");
 const Blog = require("../models/Blogs");
-const User = require("../models/User");
-const postBlog = async (req, res) => {
-  try {
-    let user = req.user;
-    const newBlog = await Blog.create({
-      title: req.body.title,
-      snippet: req.body.snippet,
-      description: req.body.description,
-      image: req.body.image,
-      author: user._id,
-    });
-    res.status(201).json({
-      status: "success",
-      data: {
-        newBlog,
-      },
-    });
-  } catch (error) {
-    res.status(400).json({
-      status: "fail",
-      message: error.message,
-    });
-  }
-};
+const asyncErrorHandler = require("../utils/asyncErrorHandler");
 
-const getBlogs = async (req, res) => {
-  try {
-    let search = req.query.search || "";
-    let page = req.query.page * 1 || 1;
-    let limit = req.query.limit * 1 || 3;
-    let sort = req.query.sort || "ratings";
-    let skip = (page - 1) * limit;
+const postBlog = asyncErrorHandler(async (req, res) => {
+  let user = req.user;
+  const newBlog = await Blog.create({
+    title: req.body.title,
+    snippet: req.body.snippet,
+    description: req.body.description,
+    image: req.body.image,
+    author: user._id,
+  });
+  res.status(201).json({
+    status: "success",
+    data: {
+      newBlog,
+    },
+  });
+});
 
-    sort && sort.split(",").join(" ");
-    const blogs = await Blog.find({ title: { $regex: search, $options: "i" } })
-      .skip(skip)
-      .limit(limit)
-      .sort(sort);
-    let totalBlogs = await Blog.countDocuments();
-    res.status(200).json({
-      status: "success",
-      page,
-      limit,
-      totalBlogs,
-      data: {
-        blogs,
-      },
-    });
-  } catch (error) {
-    res.status(500).json({
-      status: "fail",
-      message: error.message,
-    });
-  }
-};
+const getBlogs = asyncErrorHandler(async (req, res) => {
+  let search = req.query.search || "";
+  let page = req.query.page * 1 || 1;
+  let limit = req.query.limit * 1 || 3;
+  let sort = req.query.sort || "ratings";
+  let skip = (page - 1) * limit;
 
-const getByAuthor = async (req, res) => {
-  try {
-    let user = req.user;
-    const blogs = await Blog.find({ author: user._id });
-    res.status(201).json({
-      status: "success",
-      data: {
-        blogs,
-      },
-    });
-  } catch (error) {
-    res.status(400).json({
-      status: "fail",
-      message: error.message,
-    });
-  }
-};
+  sort && sort.split(",").join(" ");
+  const blogs = await Blog.find({ title: { $regex: search, $options: "i" } })
+    .skip(skip)
+    .limit(limit)
+    .sort(sort);
+  let totalBlogs = await Blog.countDocuments();
+  res.status(200).json({
+    status: "success",
+    page,
+    limit,
+    totalBlogs,
+    data: {
+      blogs,
+    },
+  });
+});
 
-const getBlog = async (req, res) => {
-  try {
-    const blog = await Blog.findById(req.params.id);
-    res.status(200).json({
-      status: "success",
-      data: {
-        blog,
-      },
-    });
-  } catch (error) {
-    res.status(404).json({
-      status: "fail",
-      message: error.message,
-    });
-  }
-};
+const getByAuthor = asyncErrorHandler(async (req, res) => {
+  let user = req.user;
+  const blogs = await Blog.find({ author: user._id });
+  res.status(201).json({
+    status: "success",
+    data: {
+      blogs,
+    },
+  });
+});
 
-const updateBlog = async (req, res) => {
-  try {
-    const updatedBlog = await Blog.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-      runValidators: true,
-    });
+const getBlog = asyncErrorHandler(async (req, res) => {
+  const blog = await Blog.findById(req.params.id);
+  res.status(200).json({
+    status: "success",
+    data: {
+      blog,
+    },
+  });
+});
 
-    res.status(200).json({
-      status: "success",
-      data: {
-        updatedBlog,
-      },
-    });
-  } catch (error) {
-    res.status(400).json({
-      status: "fail",
-      message: error.message,
-    });
-  }
-};
+const updateBlog = asyncErrorHandler(async (req, res) => {
+  const updatedBlog = await Blog.findByIdAndUpdate(req.params.id, req.body, {
+    new: true,
+    runValidators: true,
+  });
 
-const deleteBlog = async (req, res) => {
-  try {
-    await Blog.findByIdAndDelete(req.params.id);
-    res.status(204).json({
-      status: "success",
-      data: null,
-    });
-  } catch (error) {
-    res.status(404).json({
-      status: "fail",
-      message: error.message,
-    });
-  }
-};
+  res.status(200).json({
+    status: "success",
+    data: {
+      updatedBlog,
+    },
+  });
+});
 
-const updateRatings = async (req, res) => {
-  try {
-    const updateRatings = await Blog.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      {
-        new: true,
-        runValidators: true,
-      }
-    );
+const deleteBlog = asyncErrorHandler(async (req, res) => {
+  await Blog.findByIdAndDelete(req.params.id);
+  res.status(204).json({
+    status: "success",
+    data: null,
+  });
+});
 
-    res.status(200).json({
-      status: "success",
-      data: {
-        updateRatings,
-      },
-    });
-  } catch (error) {
-    res.status(400).json({
-      status: "fail",
-      message: error.message,
-    });
-  }
-};
+const updateRatings = asyncErrorHandler(async (req, res) => {
+  const updateRatings = await Blog.findByIdAndUpdate(req.params.id, req.body, {
+    new: true,
+    runValidators: true,
+  });
 
+  res.status(200).json({
+    status: "success",
+    data: {
+      updateRatings,
+    },
+  });
+});
 module.exports = {
   postBlog,
   getBlogs,
