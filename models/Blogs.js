@@ -26,14 +26,6 @@ const blogSchema = new Schema({
     default: "",
   },
 
-  ratings: {
-    type: Number,
-    default: 1,
-    validator: {
-     max:[5,"above 1"],
-     min:[1,"below 5"],
-    },
-  },
 });
 
 module.exports = model("blog", blogSchema);

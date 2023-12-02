@@ -5,14 +5,14 @@ const CustomError = require("../utils/CustomError");
 
 const getToken = async (id) => {
   return await jwt.sign({ id }, process.env.JWT_SECRET, {
-    expiresIn: 24 * 60 * 60,
+    expiresIn: 24*60*60,
   });
 };
 const signup = asyncErrorHandler(async (req, res, next) => {
   const { name, email, password, confirmPassword } = req.body;
 
   //verify if user is present already
- 
+
   const newUser = await User.create(req.body);
   const token = await getToken(newUser._id);
   res.status(201).json({

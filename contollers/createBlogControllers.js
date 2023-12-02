@@ -1,4 +1,5 @@
 const Blog = require("../models/Blogs");
+const Ratings = require("../models/Ratings");
 const asyncErrorHandler = require("../utils/asyncErrorHandler");
 
 const postBlog = asyncErrorHandler(async (req, res) => {
@@ -85,19 +86,33 @@ const deleteBlog = asyncErrorHandler(async (req, res) => {
   });
 });
 
-const updateRatings = asyncErrorHandler(async (req, res) => {
-  const updateRatings = await Blog.findByIdAndUpdate(req.params.id, req.body, {
-    new: true,
-    runValidators: true,
-  });
 
+
+
+let postRating=asyncErrorHandler(async(req,res)=>{
+  let userId=req.params._id
+  let blogId=req.params._id
+  let rating=await Ratings.create({ratings:req.body.ratings,userId:userId,blogId:blogId})
   res.status(200).json({
-    status: "success",
-    data: {
-      updateRatings,
-    },
-  });
-});
+    status:"success",
+    blogId,
+    data:{
+      rating
+    }
+  })
+})
+
+let getRatings=asyncErrorHandler(async(req,res)=>{
+  let blogId=req.params.id
+  let ratings=await Ratings.find({blogId:blogId})
+  res.status(200).json({
+    status:"success",
+    blogId,
+    data:{
+      ratings
+    }
+  })
+})
 module.exports = {
   postBlog,
   getBlogs,
@@ -105,5 +120,6 @@ module.exports = {
   updateBlog,
   deleteBlog,
   getByAuthor,
-  updateRatings,
+  postRating,
+  getRatings
 };

@@ -44,6 +44,11 @@ const handleCastError = (err) => {
   return error;
 };
 
+const handleTokenExpired=()=>{
+  let error= new CustomError(400,"your session has been expired please login once again ")
+  return error;
+}
+
 module.exports = (err, req, res, next) => {
   err.statusCode = err.statusCode || 500;
   err.status = err.status || "error";
@@ -63,6 +68,10 @@ module.exports = (err, req, res, next) => {
       err = handleCastError(err);
     }
 
+    if (err.name === "TokenExpiredError") {
+      err=handleTokenExpired(err)
+    }
+    
     prodError(res, err);
   }
 };
