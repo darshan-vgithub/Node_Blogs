@@ -2,7 +2,7 @@ const { Schema, model } = require("mongoose");
 const validator = require("validator");
 const bcrypt = require("bcryptjs");
 
-const userSchema = new Schema(
+const AuthorSchema = new Schema(
   {
     name: {
       type: String,
@@ -35,20 +35,20 @@ const userSchema = new Schema(
     role: {
       type: String,
       enum: {
-        values: ["user"],
+        values: ["author"],
         message: `{VALUE} role is not defined`,
       },
-      default: "user",
+      default: "author",
     },
   },
   { timestamps: true }
 );
-userSchema.pre("save", async function (next) {
+AuthorSchema.pre("save", async function (next) {
   this.password = await bcrypt.hash(this.password, 10);
   next();
 });
 
-userSchema.methods.comparePassword = async function (pwd, pwdDB) {
+AuthorSchema.methods.comparePassword = async function (pwd, pwdDB) {
   return await bcrypt.compare(pwd, pwdDB);
 };
-module.exports = model("user", userSchema);
+module.exports = model("author", AuthorSchema);
